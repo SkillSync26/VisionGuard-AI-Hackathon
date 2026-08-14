@@ -13,7 +13,6 @@ const counts = document.getElementById("counts");
 
 const alertBox = document.getElementById("alert");
 
-
 let stream = null;
 let socket = null;
 let timer = null;
@@ -26,32 +25,62 @@ let busy = false;
 
 async function start() {
 
+    // Camera already running
     if (stream) {
         return;
     }
 
     try {
 
-        stream =
-            await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: 960,
-                    height: 540
-                },
-                audio: false
-            });
+        // ----------------------------------------------------
+        // Request browser camera
+        // ----------------------------------------------------
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: 960,
+                height: 540
+            },
+            audio: false
+        });
 
         video.srcObject = stream;
+
+        // Make sure video starts playing
+        await video.play();
 
 
         // ----------------------------------------------------
         // WebSocket connection
+        // IMPORTANT:
+        // HTTPS  -> WSS
+        // HTTP   -> WS
         // ----------------------------------------------------
 
-        socket =
-            new WebSocket(
-                `ws://${location.host}/ws/live`
-            );
+        const wsProtocol =
+            location.protocol === "https:"
+                ? "wss:"
+                : "ws:";
+
+        const wsUrl =
+            `${wsProtocol}//${location.host}/ws/live`;
+
+        console.log("Connecting WebSocket:", wsUrl);
+
+        socket = new WebSocket(wsUrl);
+
+
+        // ----------------------------------------------------
+        // WebSocket opened
+        // ----------------------------------------------------
+
+        socket.onopen = () => {
+
+            console.log("WebSocket connected.");
+
+            alertBox.textContent =
+                "✓ Camera connected. AI detection running.";
+        };
 
 
         // ----------------------------------------------------
@@ -60,119 +89,154 @@ async function start() {
 
         socket.onmessage = (event) => {
 
-            const data =
-                JSON.parse(event.data);
+            try {
+
+                const data = JSON.parse(event.data);
 
 
-            // -----------------------------------------------
-            // Backend error
-            // -----------------------------------------------
+                // --------------------------------------------
+                // Backend error
+                // --------------------------------------------
 
-            if (data.error) {
+                if (data.error) {
 
-                alertBox.textContent =
-                    `⚠️ ${data.error}`;
+                    alertBox.textContent =
+                        `⚠️ ${data.error}`;
+
+                    busy = false;
+
+                    return;
+                }
+
+
+                // --------------------------------------------
+                // Processed image
+                // --------------------------------------------
+
+                if (data.image) {
+
+                    result.src = data.image;
+                }
+
+
+                // --------------------------------------------
+                // Statistics
+                // --------------------------------------------
+
+                const statistics =
+                    data.statistics || {};
+
+
+                objects.textContent =
+                    statistics.total_objects ?? 0;
+
+
+                people.textContent =
+                    statistics.people ?? 0;
+
+
+                fps.textContent =
+                    Number(statistics.fps ?? 0).toFixed(2);
+
+
+                const averageConfidence =
+                    Number(
+                        statistics.average_confidence ?? 0
+                    );
+
+
+                confidence.textContent =
+                    `${(averageConfidence * 100).toFixed(1)}%`;
+
+
+                // --------------------------------------------
+                // Object counts
+                // --------------------------------------------
+
+                const objectCounts =
+                    statistics.counts || {};
+
+
+                counts.innerHTML =
+                    Object.entries(objectCounts)
+                        .map(
+                            ([name, count]) =>
+                                `<div>${name}: <b>${count}</b></div>`
+                        )
+                        .join("")
+                    || "No objects";
+
+
+                // --------------------------------------------
+                // SMART ALERTS
+                // --------------------------------------------
+
+                const alerts =
+                    data.alerts || [];
+
+
+                if (alerts.length > 0) {
+
+                    const alert =
+                        alerts[0];
+
+
+                    const icons = {
+
+                        PHONE_DETECTED: "📱",
+
+                        CROWD_DETECTED: "🚨",
+
+                        PERSON_DETECTED: "👤",
+
+                        WEAPON_DETECTED: "⚠️",
+
+                        FIRE_DETECTED: "🔥"
+
+                    };
+
+
+                    const icon =
+                        icons[alert.type] || "⚠️";
+
+
+                    alertBox.textContent =
+                        `${icon} ${alert.message}`;
+
+                } else {
+
+                    alertBox.textContent =
+                        "✓ No active alert.";
+                }
+
 
                 busy = false;
 
-                return;
+            } catch (error) {
+
+                console.error(
+                    "Invalid backend response:",
+                    error
+                );
+
+                busy = false;
             }
+        };
 
 
-            // -----------------------------------------------
-            // Processed image
-            // -----------------------------------------------
+        // ----------------------------------------------------
+        // WebSocket error
+        // ----------------------------------------------------
 
-            if (data.image) {
+        socket.onerror = (error) => {
 
-                result.src =
-                    data.image;
-            }
+            console.error(
+                "WebSocket error:",
+                error
+            );
 
-
-            // -----------------------------------------------
-            // Statistics
-            // -----------------------------------------------
-
-            const statistics =
-                data.statistics || {};
-
-
-            objects.textContent =
-                statistics.total_objects ?? 0;
-
-
-            people.textContent =
-                statistics.people ?? 0;
-
-
-            fps.textContent =
-                statistics.fps ?? 0;
-
-
-            confidence.textContent =
-                `${(
-                    (statistics.average_confidence || 0)
-                    * 100
-                ).toFixed(1)}%`;
-
-
-            // -----------------------------------------------
-            // Object counts
-            // -----------------------------------------------
-
-            counts.innerHTML =
-                Object.entries(
-                    statistics.counts || {}
-                )
-                .map(
-                    ([name, count]) =>
-                        `<div>${name}: <b>${count}</b></div>`
-                )
-                .join("")
-                || "No objects";
-
-
-            // -----------------------------------------------
-            // SMART ALERTS
-            // -----------------------------------------------
-
-            const alerts =
-                data.alerts || [];
-
-
-            if (alerts.length > 0) {
-
-                const alert =
-                    alerts[0];
-
-
-                const icons = {
-
-                    PHONE_DETECTED:
-                        "📱",
-
-                    CROWD_DETECTED:
-                        "🚨"
-                };
-
-
-                const icon =
-                    icons[alert.type]
-                    || "⚠️";
-
-
-                alertBox.textContent =
-                    `${icon} ${alert.message}`;
-
-
-            } else {
-
-                alertBox.textContent =
-                    "✓ No active alert.";
-
-            }
-
+            alertBox.textContent =
+                "⚠️ AI backend connection failed.";
 
             busy = false;
         };
@@ -184,20 +248,23 @@ async function start() {
 
         socket.onclose = () => {
 
+            console.log(
+                "WebSocket connection closed."
+            );
+
             busy = false;
+
         };
 
 
         // ----------------------------------------------------
-        // Send frames
+        // Send frames to backend
         // ----------------------------------------------------
 
-        timer =
-            setInterval(
-                sendFrame,
-                140
-            );
-
+        timer = setInterval(
+            sendFrame,
+            140
+        );
 
     } catch (error) {
 
@@ -209,6 +276,7 @@ async function start() {
         alertBox.textContent =
             "⚠️ Camera access failed.";
 
+        stream = null;
     }
 }
 
@@ -219,6 +287,7 @@ async function start() {
 
 function sendFrame() {
 
+    // Do not send if WebSocket isn't ready
     if (
         !socket ||
         socket.readyState !== WebSocket.OPEN ||
@@ -233,7 +302,10 @@ function sendFrame() {
     busy = true;
 
 
-    // Use the full camera resolution
+    // --------------------------------------------------------
+    // Camera resolution
+    // --------------------------------------------------------
+
     canvas.width = 960;
     canvas.height = 540;
 
@@ -241,6 +313,10 @@ function sendFrame() {
     const ctx =
         canvas.getContext("2d");
 
+
+    // --------------------------------------------------------
+    // Draw current camera frame
+    // --------------------------------------------------------
 
     ctx.drawImage(
         video,
@@ -251,13 +327,22 @@ function sendFrame() {
     );
 
 
-    // Higher JPEG quality
-    socket.send(
+    // --------------------------------------------------------
+    // Convert frame to JPEG
+    // --------------------------------------------------------
+
+    const imageData =
         canvas.toDataURL(
             "image/jpeg",
             0.82
-        )
-    );
+        );
+
+
+    // --------------------------------------------------------
+    // Send frame to YOLO backend
+    // --------------------------------------------------------
+
+    socket.send(imageData);
 }
 
 
@@ -267,18 +352,46 @@ function sendFrame() {
 
 async function stop() {
 
-    clearInterval(timer);
+    console.log("Stopping camera...");
 
-    timer = null;
 
+    // --------------------------------------------------------
+    // Stop frame timer
+    // --------------------------------------------------------
+
+    if (timer) {
+
+        clearInterval(timer);
+
+        timer = null;
+    }
+
+
+    // --------------------------------------------------------
+    // Close WebSocket
+    // --------------------------------------------------------
 
     if (socket) {
 
-        socket.close();
+        try {
+
+            socket.close();
+
+        } catch (error) {
+
+            console.error(
+                "WebSocket close error:",
+                error
+            );
+        }
     }
 
     socket = null;
 
+
+    // --------------------------------------------------------
+    // Stop camera tracks
+    // --------------------------------------------------------
 
     if (stream) {
 
@@ -291,7 +404,21 @@ async function stop() {
 
     stream = null;
 
+
+    // --------------------------------------------------------
+    // Clear video
+    // --------------------------------------------------------
+
+    if (video) {
+
+        video.srcObject = null;
+    }
+
+
     busy = false;
+
+
+    console.log("Camera stopped.");
 }
 
 
@@ -299,9 +426,16 @@ async function stop() {
 // BUTTONS
 // ============================================================
 
-startBtn.onclick = start;
+if (startBtn) {
 
-stopBtn.onclick = stop;
+    startBtn.onclick = start;
+}
+
+
+if (stopBtn) {
+
+    stopBtn.onclick = stop;
+}
 
 
 // ============================================================
@@ -311,4 +445,4 @@ stopBtn.onclick = stop;
 window.addEventListener(
     "beforeunload",
     stop
-);
+);  
