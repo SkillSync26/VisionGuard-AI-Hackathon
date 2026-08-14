@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Detection</title><link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/">VisionGuard <span>AI</span></a><nav>
+<a href="/page/live">Live</a><a href="/page/image">Image</a><a href="/page/video">Video</a><a href="/page/dashboard">Dashboard</a><a href="/page/history">History</a></nav></header>
+<main class="container page">
+<h1>Live Detection</h1><p class="muted">Allow browser camera access. Frames are processed by the FastAPI YOLO backend.</p>
+<div class="live-layout">
+<section class="panel video-panel">
+  <video id="camera" autoplay muted playsinline></video>
+  <img id="result" alt="AI annotated stream">
+  <canvas id="canvas" hidden></canvas>
+  <div class="actions"><button id="start" class="btn primary">Start Camera</button><button id="stop" class="btn">Stop</button></div>
+</section>
+<section>
+<div class="stats-grid">
+<div class="stat"><span>Objects</span><b id="objects">0</b></div>
+<div class="stat"><span>People</span><b id="people">0</b></div>
+<div class="stat"><span>FPS</span><b id="fps">0</b></div>
+<div class="stat"><span>Avg confidence</span><b id="confidence">0%</b></div>
+</div>
+<div class="panel"><h3>Detected classes</h3><div id="counts"></div></div>
+<div class="panel alert-box"><h3>Alerts</h3><div id="alert">No active alert.</div></div>
+</section>
+</div>
+</main>
+<script src="/static/js/live.js"></script>
+</body></html>

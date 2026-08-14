@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard</title><link rel="stylesheet" href="/static/css/style.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/">VisionGuard <span>AI</span></a><nav>
+<a href="/page/live">Live</a><a href="/page/image">Image</a><a href="/page/video">Video</a><a href="/page/dashboard">Dashboard</a><a href="/page/history">History</a></nav></header>
+<main class="container page"><h1>Analytics Dashboard</h1>
+<div class="stats-grid four"><div class="stat"><span>Total detections</span><b id="total">0</b></div><div class="stat"><span>Average confidence</span><b id="avg">0%</b></div><div class="stat"><span>Total alerts</span><b id="alerts">0</b></div><div class="stat"><span>Backend</span><b>ONLINE</b></div></div>
+<div class="chart-grid"><div class="panel"><h3>Objects by class</h3><canvas id="classChart"></canvas></div><div class="panel"><h3>Detections by source</h3><canvas id="sourceChart"></canvas></div></div>
+<div class="actions"><a class="btn" href="/reports/csv">Download CSV report</a><a class="btn" href="/reports/pdf">Download PDF report</a></div>
+</main><script src="/static/js/dashboard.js"></script></body></html>

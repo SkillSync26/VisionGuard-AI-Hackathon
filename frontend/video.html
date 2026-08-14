@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Detection</title><link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/">VisionGuard <span>AI</span></a><nav>
+<a href="/page/live">Live</a><a href="/page/image">Image</a><a href="/page/video">Video</a><a href="/page/dashboard">Dashboard</a><a href="/page/history">History</a></nav></header>
+<main class="container page"><h1>Video Detection</h1>
+<div class="panel upload"><input id="file" type="file" accept="video/mp4,video/*"><button id="run" class="btn primary">Process Video</button></div>
+<p id="status" class="muted"></p>
+<div id="result" class="panel hidden"><h3>Processing complete</h3><pre id="stats"></pre><a id="download" class="btn primary" target="_blank">Download processed video</a></div>
+</main><script src="/static/js/video.js"></script></body></html>

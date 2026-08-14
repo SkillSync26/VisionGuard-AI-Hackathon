@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image Detection</title><link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/">VisionGuard <span>AI</span></a><nav>
+<a href="/page/live">Live</a><a href="/page/image">Image</a><a href="/page/video">Video</a><a href="/page/dashboard">Dashboard</a><a href="/page/history">History</a></nav></header>
+<main class="container page"><h1>Image Detection</h1>
+<div class="panel upload"><input id="file" type="file" accept="image/*"><button id="run" class="btn primary">Analyze Image</button></div>
+<div id="status" class="muted"></div>
+<div class="result-grid"><div><img id="preview" class="result-image"></div><div class="panel"><h3>Results</h3><pre id="results">Upload an image and analyze it.</pre><a id="download" class="btn primary hidden" target="_blank">Download processed image</a></div></div>
+</main><script src="/static/js/image.js"></script></body></html>

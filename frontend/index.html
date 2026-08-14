@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VisionGuard AI</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">VisionGuard <span>AI</span></a>
+  <nav>
+    <a href="/page/live">Live</a>
+    <a href="/page/image">Image</a>
+    <a href="/page/video">Video</a>
+    <a href="/page/dashboard">Dashboard</a>
+    <a href="/page/history">History</a>
+    <a href="/page/about">About</a>
+  </nav>
+</header>
+<main class="hero container">
+  <div>
+    <div class="eyebrow">YOLO • TRACKING • ANALYTICS</div>
+    <h1>AI Object Detection & Intelligent Monitoring</h1>
+    <p>Turn live camera feeds, images and videos into actionable detection, tracking, counting and alert data.</p>
+    <div class="actions">
+      <a class="btn primary" href="/page/live">Start Live Detection</a>
+      <a class="btn" href="/page/dashboard">Open Dashboard</a>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="status-dot"></div>
+    <strong>Real AI inference</strong>
+    <p>Powered by Ultralytics YOLO and OpenCV.</p>
+    <div class="mini-grid">
+      <div><b>Detection</b><span>Live</span></div>
+      <div><b>Tracking</b><span>IDs</span></div>
+      <div><b>Counting</b><span>Line</span></div>
+      <div><b>Alerts</b><span>Smart</span></div>
+    </div>
+  </div>
+</main>
+<section class="container cards">
+  <div class="feature"><b>📷 Live Detection</b><span>Browser webcam → FastAPI → YOLO.</span></div>
+  <div class="feature"><b>🎯 Tracking</b><span>Maintain object IDs between frames.</span></div>
+  <div class="feature"><b>🚨 Alerts</b><span>Crowd threshold monitoring.</span></div>
+  <div class="feature"><b>📊 Analytics</b><span>Real SQLite-backed statistics.</span></div>
+</section>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

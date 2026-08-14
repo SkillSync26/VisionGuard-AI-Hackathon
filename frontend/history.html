@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Detection History</title><link rel="stylesheet" href="/static/css/style.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/">VisionGuard <span>AI</span></a><nav>
+<a href="/page/live">Live</a><a href="/page/image">Image</a><a href="/page/video">Video</a><a href="/page/dashboard">Dashboard</a><a href="/page/history">History</a></nav></header>
+<main class="container page"><div class="page-head"><div><h1>Detection History</h1><p class="muted">Real events stored in SQLite.</p></div><button id="clear" class="btn danger">Delete history</button></div>
+<div class="filters"><input id="date" type="date"><input id="type" placeholder="Object type e.g. person"><select id="source"><option value="">All sources</option><option>webcam</option><option>image</option><option>video</option></select><button id="filter" class="btn">Filter</button></div>
+<div class="panel table-wrap"><table><thead><tr><th>Time</th><th>Class</th><th>Confidence</th><th>Source</th><th>Track ID</th><th>Alert</th></tr></thead><tbody id="rows"></tbody></table></div>
+</main><script src="/static/js/history.js"></script></body></html>
